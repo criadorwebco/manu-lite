@@ -1,0 +1,21 @@
+services:
+  escritorio-ia:
+    build:
+      context: .
+    container_name: escritorio-ia
+    restart: unless-stopped
+    # Precisa rodar como root pra ler ~/.hermes (dono root, 700) do host — só
+    # tem um mount read-only, então o risco fica contido nesse container.
+    user: root
+    ports:
+      - "4747:4747"
+    volumes:
+      - ~/.hermes:/hermes-data:ro
+    environment:
+      - HABBLAUD_LANG=pt-BR
+      # Se for acessar por domínio (não só localhost), liste aqui:
+      # - HABBLAUD_ALLOWED_HOSTS=escritorio.seudominio.com
+      # Trava de acesso opcional (cookie+token) — veja o README.
+      # - HABBLAUD_ACCESS_TOKEN=um-token-aleatorio-aqui
+      - HERMES_STATE_DB=/hermes-data/state.db
+      - HERMES_OWNER_NAME=Chefe

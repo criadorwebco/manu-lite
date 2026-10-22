@@ -1,12 +1,22 @@
 # 🤖 Manu (versão simples)
 
 Uma versão enxuta da **Manu** — assistente de IA pessoal que roda em cima do
-[Hermes Agent](https://github.com/NousResearch/hermes-agent) (open source).
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) (open source) —
+e um [escritório visual](./escritorio-ia) pra ver ela trabalhando ao vivo.
 
 Isso **não** é o produto completo da GuildaHub. Tem uma versão bem simples
 do time (Giovana, Thiago, Leonardo, Rafael, Mel e Dudu), mas sem voz, sem
 orquestração automática entre eles, sem instalador de 1 clique, sem suporte.
 É a Manu no básico, pra rodar no seu próprio servidor.
+
+## O que tem neste repo
+
+| Pasta/arquivo | O que é |
+|---|---|
+| `SOUL.md` + `AGENTS.md` | Identidade e regras básicas da Manu |
+| `team/` | Versão simples de 6 "colegas" (sem orquestração automática) |
+| `install.sh` | Instala o Hermes Agent + planta a persona da Manu |
+| [`escritorio-ia/`](./escritorio-ia) | Escritório virtual em pixel art pra ver a Manu trabalhando ao vivo (fork do [Habblaud](https://github.com/marmottajr/habblaud), MIT) |
 
 ## O que você precisa
 
@@ -36,28 +46,26 @@ Prefere fazer na mão? Segue o guia oficial do
 [Hermes Agent](https://github.com/NousResearch/hermes-agent) e depois copie
 `SOUL.md` e `AGENTS.md` deste repo pra dentro de `~/.hermes/`.
 
-## O que tem aqui dentro
-
-| Arquivo | O que é |
-|---|---|
-| `SOUL.md` | Identidade da Manu — nome, jeito de falar, personalidade |
-| `AGENTS.md` | Regrinhas básicas de segurança (não é o contrato completo) |
-| `team/` | Versão simples de 6 "colegas" (Giovana, Thiago, Leonardo, Rafael, Mel, Dudu) |
-| `install.sh` | Script que instala tudo de uma vez |
-
 Sobre o `team/`: são arquivos simples que a própria Manu lê quando o assunto
 é claramente de um deles (ex: pergunta de código → ela lê `leonardo-dev.md`
 e responde nesse papel). Não tem orquestração automática nem delegação real
 entre eles — é bem mais rústico que o produto completo.
 
+## Quer ver ela trabalhando?
+
+Depois de instalar a Manu acima, suba o [`escritorio-ia/`](./escritorio-ia)
+— um escritório em pixel art que lê o Hermes ao vivo e mostra cada
+conversa/ferramenta acontecendo em tempo real.
+
 ## Quer o pacote completo?
 
-Essa versão é só a ponta do iceberg. O produto de verdade da GuildaHub tem:
+Essas versões são só a ponta do iceberg. O produto de verdade da GuildaHub tem:
 
 - 🧑‍💻 O time de verdade, com **orquestração automática** — a Manu delega
   a tarefa pro especialista certo sozinha, sem você precisar pedir
 - 🎙️ **Voz em tempo real** — fala com ela, ela responde por voz
-- 🏢 **Escritório virtual 3D** pra ver o time trabalhando
+- 🏢🎙️ **Escritório com a voz integrada e domínio/HTTPS prontos** — sem
+  configurar nada na mão, e um **Guilda Office em 3D** à parte
 - ⚡ **Instalador de 1 clique** — zero servidor, zero Docker, zero
   configuração na mão
 - 🛟 Suporte de verdade quando algo travar

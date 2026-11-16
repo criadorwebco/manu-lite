@@ -7,10 +7,8 @@ services:
     # Precisa rodar como root pra ler ~/.hermes (dono root, 700) do host — só
     # tem um mount read-only, então o risco fica contido nesse container.
     user: root
-    #ports:
-    #  - "4747:4747"
-    expose:
-       - "4747"
+    ports:
+      - "4747:4747"
     volumes:
       - ~/.hermes:/hermes-data:ro
     environment:

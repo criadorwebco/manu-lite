@@ -68,7 +68,12 @@ export class SourceSet {
   start(): Promise<void> {
     const pending: Promise<void>[] = [];
     for (const s of this.list) {
-      const failed = (err: unknown) => log.error(tr('Fonte de agentes {0}: falha ao iniciar ({1}).', [s.provider, errMsg(err)]));
+      const failed = (err: unknown) => {
+        const detail = err instanceof Error
+          ? `${typeof (err as { code?: unknown }).code === 'string' ? (err as { code: string }).code : ''}: ${err.message}\n${err.stack ?? ''}`
+          : String(err);
+        log.error(tr('Fonte de agentes {0}: falha ao iniciar ({1}).', [s.provider, detail]));
+      };
       try {
         const r = s.start();
         if (r) pending.push(r.catch(failed));

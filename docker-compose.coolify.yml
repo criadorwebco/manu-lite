@@ -4,29 +4,38 @@ services:
     image: nousresearch/hermes-agent:latest
     restart: unless-stopped
     command: ["gateway", "run"]
-
     environment:
       HERMES_HOME: /opt/data
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?}
-      TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:?}
-
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?Configure OPENROUTER_API_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?Configure TELEGRAM_BOT_TOKEN}
+      TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:?Configure TELEGRAM_ALLOWED_USERS}
     volumes:
       - manu-hermes:/opt/data
+
+  corrigir-permissoes-escritorio:
+    image: alpine:3.22
+    user: "0:0"
+    restart: "no"
+    volumes:
+      - manu-office:/data
+    command:
+      - sh
+      - -c
+      - "chown -R 10000:10000 /data && echo 'Permissões do escritório corrigidas'"
 
   escritorio-ia:
     build:
       context: ./escritorio-ia
       dockerfile: Dockerfile
-
     restart: unless-stopped
-
+    user: "10000:10000"
     depends_on:
-      - hermes
-
+      hermes:
+        condition: service_started
+      corrigir-permissoes-escritorio:
+        condition: service_completed_successfully
     ports:
       - "127.0.0.1:4747:4747"
-
     environment:
       NODE_ENV: production
       HABBLAUD_HOST: 0.0.0.0
@@ -34,15 +43,10 @@ services:
       HABBLAUD_IN_DOCKER: "1"
       HABBLAUD_LANG: pt-BR
       HABBLAUD_DATA_DIR: /data
-
-      # Acesso restrito ao computador via túnel SSH
       HABBLAUD_BIND: 127.0.0.1
-      HABBLAUD_ACCESS_TOKEN: ${MANU_ACCESS_TOKEN:?}
-
-      # Banco do Hermes em modo somente leitura
+      HABBLAUD_ACCESS_TOKEN: ${MANU_ACCESS_TOKEN:?Configure MANU_ACCESS_TOKEN}
       HERMES_STATE_DB: /hermes-data/state.db
       HERMES_OWNER_NAME: Chefe
-
     volumes:
       - manu-hermes:/hermes-data:ro
       - manu-office:/data

@@ -55,7 +55,7 @@ services:
       HABBLAUD_REMOTE_PASSWORD_HASH: ${HABBLAUD_REMOTE_PASSWORD_HASH:?Configure HABBLAUD_REMOTE_PASSWORD_HASH}
       # Use 1 somente se o proxy TLS do Coolify encaminhar pela rede Docker interna.
       # Preferível: TLS nativo do Habblaud com certificados montados em /remote-tls.
-      HABBLAUD_REMOTE_INSECURE_HTTP: ${HABBLAUD_REMOTE_INSECURE_HTTP:?Defina explicitamente HABBLAUD_REMOTE_INSECURE_HTTP}
+      HABBLAUD_REMOTE_INSECURE_HTTP: "1"
       HERMES_STATE_DB: /hermes-data/state.db
       HERMES_OWNER_NAME: "Chefe"
     volumes:

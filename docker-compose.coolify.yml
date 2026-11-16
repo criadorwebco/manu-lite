@@ -36,6 +36,7 @@ services:
         condition: service_completed_successfully
     expose:
       - "4747"
+      - "4748"
     environment:
       NODE_ENV: production
       HABBLAUD_HOST: 0.0.0.0

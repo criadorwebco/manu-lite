@@ -1,95 +1,71 @@
+# Coolify Compose — Habblaud + Hermes
+# Preserva os volumes nomeados existentes: manu-hermes e manu-office.
+# Não execute "docker compose down -v" nem renomeie esses volumes.
 
 services:
-  # ==========================================
-  # HERMES AGENT
-  # ==========================================
   hermes:
     image: nousresearch/hermes-agent:latest
     restart: unless-stopped
     command: ["gateway", "run"]
-
     environment:
       HERMES_HOME: /opt/data
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?Configure OPENROUTER_API_KEY}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:?Configure NVIDIA_API_KEY}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?Configure TELEGRAM_BOT_TOKEN}
       TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:?Configure TELEGRAM_ALLOWED_USERS}
-
     volumes:
       - manu-hermes:/opt/data
 
-  # ==========================================
-  # CORREÇÃO DE PERMISSÕES
-  # ==========================================
   corrigir-permissoes-escritorio:
     image: alpine:3.22
     user: "0:0"
     restart: "no"
-
     volumes:
       - manu-office:/data
-
     command:
       - sh
       - -c
-      - "chown -R 10000:10000 /data && echo 'Permissões do escritório corrigidas'"
+      - "chown -R 10000:10000 /data && echo 'Permissões do escritório verificadas'"
 
-  # ==========================================
-  # HABBLAUD - ESCRITÓRIO IA
-  # ==========================================
   escritorio-ia:
     build:
       context: ./escritorio-ia
       dockerfile: Dockerfile
-
     restart: unless-stopped
     user: "10000:10000"
-
     depends_on:
       hermes:
         condition: service_started
       corrigir-permissoes-escritorio:
         condition: service_completed_successfully
-
     expose:
       - "4747"
       - "4748"
-
     environment:
       NODE_ENV: production
-
-      # Servidor
       HABBLAUD_HOST: "0.0.0.0"
       HABBLAUD_PORT: "4747"
       HABBLAUD_IN_DOCKER: "1"
       HABBLAUD_LANG: "pt-BR"
-
-      # Rede e acesso
+      HABBLAUD_DATA_DIR: /data
       HABBLAUD_BIND: "127.0.0.1"
       HABBLAUD_ALLOWED_HOSTS: ${HABBLAUD_ALLOWED_HOSTS:?Configure HABBLAUD_ALLOWED_HOSTS}
-
-      # Autenticação do Habblaud
+      HABBLAUD_ACCESS_TOKEN: ${MANU_ACCESS_TOKEN:?Configure MANU_ACCESS_TOKEN}
       HABBLAUD_REMOTE_USER: ${HABBLAUD_REMOTE_USER:?Configure HABBLAUD_REMOTE_USER}
       HABBLAUD_REMOTE_PASSWORD_HASH: ${HABBLAUD_REMOTE_PASSWORD_HASH:?Configure HABBLAUD_REMOTE_PASSWORD_HASH}
-
-      # Acesso HTTP interno atrás do proxy HTTPS
-      HABBLAUD_REMOTE_INSECURE_HTTP: "1"
-
-      # Token de integração
-      HABBLAUD_ACCESS_TOKEN: ${MANU_ACCESS_TOKEN:?Configure MANU_ACCESS_TOKEN}
-
-      # Integração com Hermes
-      HABBLAUD_DATA_DIR: /data
+      # Use 1 somente se o proxy TLS do Coolify encaminhar pela rede Docker interna.
+      # Preferível: TLS nativo do Habblaud com certificados montados em /remote-tls.
+      HABBLAUD_REMOTE_INSECURE_HTTP: ${HABBLAUD_REMOTE_INSECURE_HTTP:?Defina explicitamente HABBLAUD_REMOTE_INSECURE_HTTP}
       HERMES_STATE_DB: /hermes-data/state.db
       HERMES_OWNER_NAME: "Chefe"
-
     volumes:
       - manu-hermes:/hermes-data:ro
       - manu-office:/data
 
-# ==========================================
-# VOLUMES PERSISTENTES
-# ==========================================
 volumes:
   manu-hermes:
+    name: znhrtpkwqmordjrnbqgkabp0_manu-hermes
+    external: true
   manu-office:
+    name: znhrtpkwqmordjrnbqgkabp0_manu-office
+    external: true

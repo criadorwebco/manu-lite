@@ -34,8 +34,10 @@ services:
         condition: service_started
       corrigir-permissoes-escritorio:
         condition: service_completed_successfully
-    ports:
-      - "127.0.0.1:4747:4747"
+    # ports:
+    #  - "127.0.0.1:4747:4747"
+    expose:
+       - "4747"
     environment:
       NODE_ENV: production
       HABBLAUD_HOST: 0.0.0.0

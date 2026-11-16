@@ -64,8 +64,4 @@ services:
 
 volumes:
   manu-hermes:
-    name: znhrtpkwqmordjrnbqgkabp0_manu-hermes
-    external: true
   manu-office:
-    name: znhrtpkwqmordjrnbqgkabp0_manu-office
-    external: true

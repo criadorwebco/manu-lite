@@ -330,6 +330,14 @@ export class HermesWatcher implements AgentSource {
       .prepare(`SELECT id, role, content, tool_calls, tool_name, timestamp FROM messages WHERE session_id = ? AND id > ? ORDER BY id ASC LIMIT 100`)
       .all(session.id, lastId) as unknown as MessageRow[];
     if (!messages.length) return;
+
+    // Novas mensagens reativam um personagem que estava ocioso.
+    // Estados de espera por aprovação são preservados.
+    if (character.status === 'idle') {
+      this.opts.office.setStatus(character.agentId, 'working');
+      character.status = 'working';
+    }
+
     character.lastMessageId.set(session.id, messages[messages.length - 1].id);
 
     for (const m of messages) {

@@ -70,7 +70,7 @@ export class SourceSet {
     for (const s of this.list) {
       const failed = (err: unknown) => {
         const detail = err instanceof Error
-          ? `${typeof (err as { code?: unknown }).code === 'string' ? (err as { code: string }).code : ''}: ${err.message}\n${err.stack ?? ''}`
+          ? `${typeof (err as { code?: unknown }).code === 'string' ? (err as unknown as { code: string }).code : ''}: ${err.message}\n${err.stack ?? ''}`
           : String(err);
         log.error(tr('Fonte de agentes {0}: falha ao iniciar ({1}).', [s.provider, detail]));
       };

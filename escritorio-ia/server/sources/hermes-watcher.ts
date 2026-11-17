@@ -163,8 +163,9 @@ export class HermesWatcher implements AgentSource {
   private openDb(): DatabaseSync | undefined {
     try {
       return new DatabaseSync(this.opts.dbPath, { readOnly: true });
-    } catch {
-      return undefined; // Hermes ainda não gerou state.db (recém provisionado) — sem erro, só vazio
+    } catch (err) {
+      log.warn(`HermesWatcher: falha ao abrir SQLite (${this.opts.dbPath}): ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+      return undefined;
     }
   }
 
@@ -172,13 +173,25 @@ export class HermesWatcher implements AgentSource {
     const db = this.openDb();
     if (!db) return;
     try {
-      const sessions = db
-        .prepare(
+      let query;
+      try {
+        query = db.prepare(
           `SELECT id, parent_session_id, started_at, ended_at, title FROM sessions
            WHERE ended_at IS NULL OR ended_at > ?
            ORDER BY started_at ASC LIMIT 40`,
-        )
-        .all((Date.now() - OFFLINE_SWEEP_MS) / 1000) as unknown as SessionRow[]; // sessions grava em segundos
+        );
+      } catch (err) {
+        log.warn(`HermesWatcher: falha ao preparar consulta SQLite (${this.opts.dbPath}): ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+        throw err;
+      }
+
+      let sessions: SessionRow[];
+      try {
+        sessions = query.all((Date.now() - OFFLINE_SWEEP_MS) / 1000) as unknown as SessionRow[];
+      } catch (err) {
+        log.warn(`HermesWatcher: falha ao executar consulta SQLite (${this.opts.dbPath}): ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+        throw err;
+      }
 
       const seenSessionIds = new Set<string>();
       for (const session of sessions) {

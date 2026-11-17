@@ -173,6 +173,13 @@ export class HermesWatcher implements AgentSource {
     const db = this.openDb();
     if (!db) return;
     try {
+      try {
+        const probe = db.prepare("SELECT 1 AS ok").get();
+        log.info(`HermesWatcher: diagnóstico SQLite SELECT 1: ${JSON.stringify(probe)}`);
+      } catch (err) {
+        log.warn(`HermesWatcher: diagnóstico SQLite SELECT 1 falhou: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+      }
+
       let query;
       try {
         query = db.prepare(

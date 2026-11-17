@@ -125,12 +125,20 @@ export class HermesWatcher implements AgentSource {
   }
 
   start(): void {
+    if (this.timer) return;
+
     this.opts.office.beginBoot();
     try {
-      this.poll();
+      try {
+        this.poll();
+      } catch (err) {
+        log.warn(`HermesWatcher: falha no poll inicial (${err instanceof Error ? err.stack ?? err.message : String(err)})`);
+      }
     } finally {
       this.opts.office.endBoot();
     }
+
+    // O acompanhamento precisa continuar mesmo se o primeiro acesso ao SQLite falhar.
     this.timer = setInterval(() => {
       try {
         this.poll();

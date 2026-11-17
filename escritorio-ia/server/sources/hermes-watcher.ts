@@ -181,7 +181,25 @@ export class HermesWatcher implements AgentSource {
            ORDER BY started_at ASC LIMIT 40`,
         );
       } catch (err) {
-        log.warn(`HermesWatcher: falha ao preparar consulta SQLite (${this.opts.dbPath}): ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+        const sqliteError = err as Error & {
+          code?: unknown;
+          errcode?: unknown;
+          errstr?: unknown;
+          errno?: unknown;
+          syscall?: unknown;
+          path?: unknown;
+        };
+        log.warn(`HermesWatcher: falha ao preparar consulta SQLite (${this.opts.dbPath}): ${JSON.stringify({
+          name: sqliteError.name,
+          message: sqliteError.message,
+          code: sqliteError.code,
+          errcode: sqliteError.errcode,
+          errstr: sqliteError.errstr,
+          errno: sqliteError.errno,
+          syscall: sqliteError.syscall,
+          path: sqliteError.path,
+          stack: sqliteError.stack,
+        })}`);
         throw err;
       }
 
